@@ -3,6 +3,7 @@ package eachare;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +31,11 @@ public class Main {
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        CommandHandler commandHandler = new CommandHandler(neighbors);
+        validateDirectory(sharedDirPath);
+
+        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath);
         commandHandler.start();
 
-        //TODO: verificar se o shareddir é valido e pode ser lido
     }
 
     private static List<Peer> getInitialNeighbors(String peersFilePath) {
@@ -57,6 +59,14 @@ public class Main {
             System.err.println("Arquivo de vizinhos nao encontrado ou erro na leitura!");
             System.exit(1);
             return null;
+        }
+    }
+
+    private static void validateDirectory(String shareDirPath) {
+        File directory = new File(shareDirPath);
+        if (!directory.exists() || !directory.isDirectory()) {
+            System.err.println("Erro: O diretório '" + shareDirPath + "' não é válido.");
+            System.exit(1);
         }
     }
 }
