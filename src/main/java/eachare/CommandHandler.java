@@ -1,6 +1,7 @@
 package eachare;
 
 import eachare.commands.Command;
+import eachare.commands.ListLocalFiles;
 import eachare.commands.ListPeers;
 
 import java.util.Scanner;
@@ -8,9 +9,11 @@ import java.util.Scanner;
 public class CommandHandler {
 
     private final NeighborList neighbors;
+    private final String shareDirPath;
 
-    public CommandHandler(NeighborList neighbors) {
+    public CommandHandler(NeighborList neighbors, String shareDirPath) {
         this.neighbors = neighbors;
+        this.shareDirPath = shareDirPath;
     }
 
     public void start() {
@@ -40,7 +43,7 @@ public class CommandHandler {
             case 2:
                 break;
             case 3:
-                break;
+                command = new ListLocalFiles(shareDirPath);
             case 4:
                 break;
             case 5:
