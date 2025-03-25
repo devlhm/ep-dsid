@@ -1,27 +1,22 @@
 package eachare.commands;
 
-import eachare.CommandHandler;
-import eachare.NeighborList;
-import eachare.Peer;
+import eachare.*;
+
 import java.util.Scanner;
 
 public class ListPeers implements Command {
 
     private final NeighborList neighbors;
+    private final MessageSender messageSender;
 
-    public ListPeers(NeighborList neighbors) {
+    public ListPeers(NeighborList neighbors, MessageSender messageSender) {
         this.neighbors = neighbors;
+        this.messageSender = messageSender;
     }
 
     @Override
     public void execute() {
-        System.out.println("[0] voltar para o menu anterior");
-
-        int index = 1;
-        for (Peer peer : neighbors.getAll()) {
-            System.out.println("[" + index + "] " + peer.getIpAddress() + ":" + peer.getPort() + " " + peer.getStatus());
-            index++;
-        }
+        printNeighbors();
 
         Scanner sc = new Scanner(System.in);
         while (true) {
@@ -35,7 +30,13 @@ public class ListPeers implements Command {
                     Peer peer = neighbors.get(commandIdx - 1);
                     System.out.println("encaminhando mensagem " + peer.getIpAddress() + ":" + peer.getPort());
 
-                    //TODO: alterar para o envio de mensagem pelo socket
+                    boolean success = messageSender.trySend(new Message(MessageType.HELLO), peer.getIpAddress(), peer.getPort());
+
+                    PeerStatus newStatus = success ? PeerStatus.ONLINE : PeerStatus.OFFLINE;
+
+                    neighbors.updateStatusByAddress(peer.getIpAddress(), peer.getPort(), newStatus);
+
+                    printNeighbors();
                 } else {
                     System.out.println("Indice inválido! Escolha um número entre 1 e " + neighbors.getAll().size());
                 }
@@ -44,7 +45,16 @@ public class ListPeers implements Command {
                 sc.next();
             }
         }
+    }
 
-        CommandHandler.showMenu();
+    private void printNeighbors() {
+        System.out.println("Lista de peers:");
+        System.out.println("\t[0] voltar para o menu anterior");
+
+        int index = 1;
+        for (Peer peer : neighbors.getAll()) {
+            System.out.println("\t[" + index + "] " + peer.getIpAddress() + ":" + peer.getPort() + " " + peer.getStatus());
+            index++;
+        }
     }
 }

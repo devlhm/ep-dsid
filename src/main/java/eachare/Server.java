@@ -1,6 +1,10 @@
 package eachare;
 
+import eachare.requesthandlers.HelloHandler;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.*;
 
 public class Server implements Runnable {
@@ -27,14 +31,37 @@ public class Server implements Runnable {
         }
     }
 
+    public void close() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void run() {
         while(!socket.isClosed()) {
             try {
                 Socket client = socket.accept();
+                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
+                clock.increment();
+
+                onMessageReceived(new Message(in.readLine()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void onMessageReceived(Message message) {
+        switch (message.getType()) {
+            case HELLO -> {
+                HelloHandler.execute(message, neighbors);
+            }
+            case GET_PEERS -> {
+                // TODO: adicionar GetPeersHandler
             }
         }
     }

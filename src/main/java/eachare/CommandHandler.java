@@ -10,12 +10,12 @@ public class CommandHandler {
 
     private final NeighborList neighbors;
     private final String shareDirPath;
-    private final Clock clock;
+    private final MessageSender messageSender;
 
-    public CommandHandler(NeighborList neighbors, String shareDirPath, Clock clock) {
+    public CommandHandler(NeighborList neighbors, String shareDirPath, MessageSender messageSender) {
         this.neighbors = neighbors;
         this.shareDirPath = shareDirPath;
-        this.clock = clock;
+        this.messageSender = messageSender;
     }
 
     public void start() {
@@ -31,6 +31,8 @@ public class CommandHandler {
                 System.err.println("Comando não encontrado. Tente novamente.");
             else {
                 command.execute();
+                if(commandIdx == 9)
+                    break;
                 showMenu();
             }
         }
@@ -41,29 +43,20 @@ public class CommandHandler {
         Command command = null;
 
         switch(commandIdx) {
-            case 1:
-                command = new ListPeers(neighbors);
-            case 2:
-                break;
-            case 3:
-                command = new ListLocalFiles(shareDirPath);
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 9:
-                break;
-            default:
-                break;
+            case 1 -> command = new ListPeers(neighbors, messageSender);
+            case 2 -> {}
+            case 3 -> command = new ListLocalFiles(shareDirPath, messageSender);
+            case 4 -> {}
+            case 5 -> {}
+            case 6 -> {}
+            case 9 -> {}
         }
 
         return command;
     }
 
     public static void showMenu() {
-        System.out.println("Escolha um comando:\n" +
+        System.out.println("Escolha um comando:" +
                 "\t[1] Listar peers\n" +
                 "\t[2] Obter peers\n" +
                 "\t[3] Listar arquivos locais\n" +

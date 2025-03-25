@@ -9,8 +9,12 @@ public class Peer {
     public Peer(String ipAddress, int port) {
         this.ipAddress = ipAddress;
         this.port = port;
+    }
 
-        System.out.println("Adicionando novo peer" + ipAddress + ":" + port + " status OFFLINE");
+    public Peer(String ipAddress, int port, PeerStatus status) {
+        this.ipAddress = ipAddress;
+        this.port = port;
+        this.status = status;
     }
 
     public String getIpAddress() {

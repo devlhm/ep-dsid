@@ -20,10 +20,10 @@ public class Main {
         int socketPort = Integer.parseInt(socketParams[1]);
 
         String peersFilePath = args[1];
-
         String sharedDirPath = args[2];
 
-        NeighborList neighbors = new NeighborList(getInitialNeighbors(peersFilePath));
+        NeighborList neighbors = getInitialNeighbors(peersFilePath);
+        validateDirectory(sharedDirPath);
 
         Clock clock = new Clock();
 
@@ -33,18 +33,19 @@ public class Main {
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        validateDirectory(sharedDirPath);
+        MessageSender messageSender = new MessageSender(clock, socketAddress, socketPort);
 
-        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath, clock);
+        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath, messageSender);
         commandHandler.start();
 
+        server.close();
     }
 
-    private static List<Peer> getInitialNeighbors(String peersFilePath) {
+    private static NeighborList getInitialNeighbors(String peersFilePath) {
         try {
             BufferedReader br = new BufferedReader(new FileReader(peersFilePath));
 
-            List<Peer> neighbors = new ArrayList<>();
+            NeighborList neighbors = new NeighborList();
 
             String line = br.readLine();
 

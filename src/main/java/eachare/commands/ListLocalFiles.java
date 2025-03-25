@@ -1,13 +1,17 @@
 package eachare.commands;
 
+import eachare.MessageSender;
+
 import java.io.File;
 
 public class ListLocalFiles implements Command{
 
     private final String shareDirpath;
+    private final MessageSender messageSender;
 
-    public ListLocalFiles(String shareDirpath) {
+    public ListLocalFiles(String shareDirpath, MessageSender messageSender) {
         this.shareDirpath = shareDirpath;
+        this.messageSender = messageSender;
     }
 
     @Override
