@@ -8,13 +8,15 @@ public class Server implements Runnable {
     private final int port;
     private final String ipAddress;
     private final NeighborList neighbors;
+    private final Clock clock;
 
     private ServerSocket socket;
 
-    public Server(int port, String ipAddress, NeighborList neighbors) {
+    public Server(int port, String ipAddress, NeighborList neighbors, Clock clock) {
         this.port = port;
         this.ipAddress = ipAddress;
         this.neighbors = neighbors;
+        this.clock = clock;
     }
 
     public void open() {

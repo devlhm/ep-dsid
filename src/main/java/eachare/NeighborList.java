@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NeighborList {
+
     private final List<Peer> neighbors = new ArrayList<>();
 
     public NeighborList(List<Peer> neighbors) {
@@ -20,6 +21,10 @@ public class NeighborList {
 
     public Peer get(int idx) {
         return neighbors.get(idx);
+    }
+
+    public int size() {
+        return neighbors.size();
     }
 
     public void updateAt(Peer neighbor, int idx) {

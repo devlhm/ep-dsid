@@ -10,10 +10,12 @@ public class CommandHandler {
 
     private final NeighborList neighbors;
     private final String shareDirPath;
+    private final Clock clock;
 
-    public CommandHandler(NeighborList neighbors, String shareDirPath) {
+    public CommandHandler(NeighborList neighbors, String shareDirPath, Clock clock) {
         this.neighbors = neighbors;
         this.shareDirPath = shareDirPath;
+        this.clock = clock;
     }
 
     public void start() {
@@ -29,6 +31,7 @@ public class CommandHandler {
                 System.err.println("Comando não encontrado. Tente novamente.");
             else {
                 command.execute();
+                showMenu();
             }
         }
     }

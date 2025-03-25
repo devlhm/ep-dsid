@@ -1,9 +1,9 @@
 package eachare;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +25,9 @@ public class Main {
 
         NeighborList neighbors = new NeighborList(getInitialNeighbors(peersFilePath));
 
-        Server server = new Server(socketPort, socketAddress, neighbors);
+        Clock clock = new Clock();
+
+        Server server = new Server(socketPort, socketAddress, neighbors, clock);
         server.open();
 
         Thread serverThread = new Thread(server);
@@ -33,7 +35,7 @@ public class Main {
 
         validateDirectory(sharedDirPath);
 
-        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath);
+        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath, clock);
         commandHandler.start();
 
     }
