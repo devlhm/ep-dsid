@@ -1,5 +1,6 @@
 package eachare;
 
+import eachare.requesthandlers.ByeHandler;
 import eachare.requesthandlers.HelloHandler;
 
 import java.io.BufferedReader;
@@ -14,7 +15,7 @@ public class Server implements Runnable {
     private final NeighborList neighbors;
     private final Clock clock;
 
-    private ServerSocket socket;
+    private static ServerSocket socket;
 
     public Server(int port, String ipAddress, NeighborList neighbors, Clock clock) {
         this.port = port;
@@ -31,7 +32,7 @@ public class Server implements Runnable {
         }
     }
 
-    public void close() {
+    public static void close() {
         try {
             socket.close();
         } catch (IOException e) {
@@ -45,8 +46,6 @@ public class Server implements Runnable {
             try {
                 Socket client = socket.accept();
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-                //clock.increment();
 
                 onMessageReceived(new Message(in.readLine()));
             } catch (IOException e) {
@@ -66,6 +65,9 @@ public class Server implements Runnable {
             }
             case GET_PEERS -> {
                 // TODO: adicionar GetPeersHandler
+            }
+            case BYE -> {
+                ByeHandler.execute(message, neighbors);
             }
         }
     }
