@@ -22,10 +22,10 @@ public class Message {
 
     public Message(String encoded) {
         try {
-            String[] messageParams = encoded.split("[ :]");
+            String[] messageParams = encoded.split("[: ]+");
 
-            this.originPort = Integer.parseInt(messageParams[0]);
-            this.originAddress = messageParams[1];
+            this.originAddress = messageParams[0];
+            this.originPort = Integer.parseInt(messageParams[1]);
             this.clockValue = Integer.parseInt(messageParams[2]);
             this.type = MessageType.valueOf(messageParams[3]);
         } catch(Exception ex) {

@@ -46,7 +46,7 @@ public class Server implements Runnable {
                 Socket client = socket.accept();
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-                clock.increment();
+                //clock.increment();
 
                 onMessageReceived(new Message(in.readLine()));
             } catch (IOException e) {
@@ -56,6 +56,10 @@ public class Server implements Runnable {
     }
 
     private void onMessageReceived(Message message) {
+        System.out.println("Mensagem recebida: \"" + message.toString().trim() + "\"");
+
+        clock.increment();
+
         switch (message.getType()) {
             case HELLO -> {
                 HelloHandler.execute(message, neighbors);

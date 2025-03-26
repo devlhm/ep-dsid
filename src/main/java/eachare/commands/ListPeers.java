@@ -28,7 +28,6 @@ public class ListPeers implements Command {
 
                 if (commandIdx > 0 && commandIdx <= neighbors.getAll().size()) {
                     Peer peer = neighbors.get(commandIdx - 1);
-                    System.out.println("encaminhando mensagem " + peer.getIpAddress() + ":" + peer.getPort());
 
                     boolean success = messageSender.trySend(new Message(MessageType.HELLO), peer.getIpAddress(), peer.getPort());
 

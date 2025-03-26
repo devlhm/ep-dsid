@@ -23,6 +23,8 @@ public class MessageSender {
             message.setOriginAddress(originAddress);
             message.setOriginPort(originPort);
 
+            showMessage(message, destinationAddress, destinationPort);
+
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             out.write(message.toString());
             out.flush();
@@ -30,5 +32,9 @@ public class MessageSender {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private void showMessage(Message message, String destinationAddress, int destinationPort){
+        System.out.println("Encaminhando menssagem \"" + message.toString().trim() + "\" para " + destinationAddress + ":" + destinationPort);
     }
 }

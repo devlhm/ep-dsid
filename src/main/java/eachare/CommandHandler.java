@@ -1,5 +1,6 @@
 package eachare;
 
+import eachare.commands.Bye;
 import eachare.commands.Command;
 import eachare.commands.ListLocalFiles;
 import eachare.commands.ListPeers;
@@ -49,20 +50,21 @@ public class CommandHandler {
             case 4 -> {}
             case 5 -> {}
             case 6 -> {}
-            case 9 -> {}
+            case 9 -> command = new Bye(neighbors, messageSender);
         }
 
         return command;
     }
 
     public static void showMenu() {
-        System.out.println("Escolha um comando:" +
-                "\t[1] Listar peers\n" +
-                "\t[2] Obter peers\n" +
-                "\t[3] Listar arquivos locais\n" +
-                "\t[4] Buscar arquivos\n" +
-                "\t[5] Exibir estatisticas\n" +
-                "\t[6] Alterar tamanho de chunk\n" +
-                "\t[9] Sair");
+        System.out.println("""
+                Escolha um comando:
+                \t[1] Listar peers
+                \t[2] Obter peers
+                \t[3] Listar arquivos locais
+                \t[4] Buscar arquivos
+                \t[5] Exibir estatisticas
+                \t[6] Alterar tamanho de chunk
+                \t[9] Sair""");
     }
 }
