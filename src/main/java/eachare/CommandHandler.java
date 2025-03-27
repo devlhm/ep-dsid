@@ -1,9 +1,6 @@
 package eachare;
 
-import eachare.commands.Bye;
-import eachare.commands.Command;
-import eachare.commands.ListLocalFiles;
-import eachare.commands.ListPeers;
+import eachare.commands.*;
 
 import java.util.Scanner;
 
@@ -45,8 +42,8 @@ public class CommandHandler {
 
         switch(commandIdx) {
             case 1 -> command = new ListPeers(neighbors, messageSender);
-            case 2 -> {}
-            case 3 -> command = new ListLocalFiles(shareDirPath, messageSender);
+            case 2 -> command = new GetPeers(neighbors, messageSender);
+            case 3 -> command = new ListLocalFiles(shareDirPath);
             case 4 -> {}
             case 5 -> {}
             case 6 -> {}

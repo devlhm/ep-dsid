@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class Main {
@@ -33,9 +31,7 @@ public class Main {
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        MessageSender messageSender = new MessageSender(clock, socketAddress, socketPort);
-
-        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath, messageSender);
+        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath, server.getMessageSender());
         commandHandler.start();
 
         server.close();

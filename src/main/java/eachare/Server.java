@@ -1,7 +1,9 @@
 package eachare;
 
 import eachare.requesthandlers.ByeHandler;
+import eachare.requesthandlers.GetPeersHandler;
 import eachare.requesthandlers.HelloHandler;
+import eachare.requesthandlers.PeerListHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +16,7 @@ public class Server implements Runnable {
     private final String ipAddress;
     private final NeighborList neighbors;
     private final Clock clock;
+    private final MessageSender messageSender;
 
     private static ServerSocket socket;
 
@@ -22,6 +25,7 @@ public class Server implements Runnable {
         this.ipAddress = ipAddress;
         this.neighbors = neighbors;
         this.clock = clock;
+        this.messageSender = new MessageSender(clock, ipAddress, port);
     }
 
     public void open() {
@@ -54,21 +58,37 @@ public class Server implements Runnable {
         }
     }
 
+    public MessageSender getMessageSender (){
+        return this.messageSender;
+    }
+
     private void onMessageReceived(Message message) {
-        System.out.println("Mensagem recebida: \"" + message.toString().trim() + "\"");
+        //System.out.println("Mensagem recebida: \"" + message.toString().trim() + "\"");
 
         clock.increment();
 
         switch (message.getType()) {
             case HELLO -> {
+                showMessage(message);
                 HelloHandler.execute(message, neighbors);
             }
             case GET_PEERS -> {
-                // TODO: adicionar GetPeersHandler
+                showMessage(message);
+                GetPeersHandler.execute(message, messageSender, neighbors);
             }
             case BYE -> {
+                showMessage(message);
                 ByeHandler.execute(message, neighbors);
             }
+            case PEER_LIST -> {
+                showMessage(message);
+                PeerListHandler.execute(message, neighbors);
+            }
         }
+    }
+
+    private void showMessage (Message message){
+        if(message.getType() != MessageType.PEER_LIST) System.out.println("Mensagem recebida: \"" + message.toString().trim() + "\"");
+        else System.out.println("Resposta recebida: \"" + message.toString().trim() + "\"");
     }
 }

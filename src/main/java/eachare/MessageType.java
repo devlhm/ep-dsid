@@ -3,5 +3,6 @@ package eachare;
 public enum MessageType {
     HELLO,
     GET_PEERS,
-    BYE
+    BYE,
+    PEER_LIST
 }

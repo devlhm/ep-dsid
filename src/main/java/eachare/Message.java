@@ -1,6 +1,7 @@
 package eachare;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Message {
@@ -22,12 +23,22 @@ public class Message {
 
     public Message(String encoded) {
         try {
-            String[] messageParams = encoded.split("[: ]+");
+            if (!encoded.contains("PEER_LIST")) {
+                String[] messageParams = encoded.split("[: ]+");
 
-            this.originAddress = messageParams[0];
-            this.originPort = Integer.parseInt(messageParams[1]);
-            this.clockValue = Integer.parseInt(messageParams[2]);
-            this.type = MessageType.valueOf(messageParams[3]);
+                this.originAddress = messageParams[0];
+                this.originPort = Integer.parseInt(messageParams[1]);
+                this.clockValue = Integer.parseInt(messageParams[2]);
+                this.type = MessageType.valueOf(messageParams[3]);
+            } else {
+                String[] messageParams = encoded.split("[: ]+", 5);
+
+                this.originAddress = messageParams[0];
+                this.originPort = Integer.parseInt(messageParams[1]);
+                this.clockValue = Integer.parseInt(messageParams[2]);
+                this.type = MessageType.valueOf(messageParams[3]);
+                this.args.addAll(Arrays.asList(messageParams[4].split(" ")));
+            }
         } catch(Exception ex) {
             throw new RuntimeException("Error decoding message: " + encoded);
         }
