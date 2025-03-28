@@ -11,7 +11,8 @@ public class GetPeersHandler {
     public static void execute(Message message, MessageSender messageSender, NeighborList neighbors){
         List<String> args = new ArrayList<>();
 
-        args.add(String.valueOf(neighbors.size()));
+        if (neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort())) args.addFirst(String.valueOf(neighbors.size() - 1));
+        else args.addFirst(String.valueOf(neighbors.size()));
 
         for (Peer peer : neighbors.getAll()){
             if (!Objects.equals(peer.getIpAddress(), message.getOriginAddress()) || (peer.getPort() != message.getOriginPort())){
