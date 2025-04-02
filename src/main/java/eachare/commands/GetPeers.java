@@ -15,11 +15,7 @@ public class GetPeers implements Command {
     @Override
     public void execute() {
         for (Peer peer : neighbors.getAll()) {
-            boolean success = messageSender.trySend(new Message(MessageType.GET_PEERS), peer.getIpAddress(), peer.getPort());
-
-            PeerStatus newStatus = success ? PeerStatus.ONLINE : PeerStatus.OFFLINE;
-
-            neighbors.updateStatusByAddress(peer.getIpAddress(), peer.getPort(), newStatus);
+            messageSender.trySend(new Message(MessageType.GET_PEERS), peer.getIpAddress(), peer.getPort());
         }
     }
 }

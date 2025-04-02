@@ -31,7 +31,7 @@ public class CommandHandler {
                 command.execute();
                 if(commandIdx == 9)
                     break;
-                showMenu();
+                if(commandIdx != 2) showMenu();
             }
         }
     }

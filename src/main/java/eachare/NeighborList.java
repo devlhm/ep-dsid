@@ -41,4 +41,12 @@ public class NeighborList {
 
         return false;
     }
+
+    public int getOnlineNumber (){
+        int onlineNumber = 0;
+        for (Peer peer : neighbors){
+            if (peer.getStatus() == PeerStatus.ONLINE ) onlineNumber++;
+        }
+        return onlineNumber;
+    }
 }

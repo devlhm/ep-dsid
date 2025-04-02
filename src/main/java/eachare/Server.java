@@ -63,25 +63,21 @@ public class Server implements Runnable {
     }
 
     private void onMessageReceived(Message message) {
-        //System.out.println("Mensagem recebida: \"" + message.toString().trim() + "\"");
 
+        showMessage(message);
         clock.increment();
 
         switch (message.getType()) {
             case HELLO -> {
-                showMessage(message);
                 HelloHandler.execute(message, neighbors);
             }
             case GET_PEERS -> {
-                showMessage(message);
                 GetPeersHandler.execute(message, messageSender, neighbors);
             }
             case BYE -> {
-                showMessage(message);
                 ByeHandler.execute(message, neighbors);
             }
             case PEER_LIST -> {
-                showMessage(message);
                 PeerListHandler.execute(message, neighbors);
             }
         }
