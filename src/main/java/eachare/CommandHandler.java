@@ -6,15 +6,9 @@ import java.util.Scanner;
 
 public class CommandHandler {
 
-    private final NeighborList neighbors;
-    private final String shareDirPath;
-    private final MessageSender messageSender;
     private final CommandFactory commandFactory;
 
     public CommandHandler(NeighborList neighbors, String shareDirPath, MessageSender messageSender) {
-        this.neighbors = neighbors;
-        this.shareDirPath = shareDirPath;
-        this.messageSender = messageSender;
         this.commandFactory = new CommandFactory(neighbors, shareDirPath, messageSender);
     }
 
