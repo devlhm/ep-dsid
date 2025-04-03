@@ -31,8 +31,8 @@ public class Main {
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        CommandHandler commandHandler = new CommandHandler(neighbors, sharedDirPath, server.getMessageSender());
-        commandHandler.start();
+        CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedDirPath, server.getMessageSender());
+        commandProcessor.start();
 
         server.close();
     }

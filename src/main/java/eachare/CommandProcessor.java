@@ -4,11 +4,11 @@ import eachare.commands.*;
 
 import java.util.Scanner;
 
-public class CommandHandler {
+public class CommandProcessor {
 
     private final CommandFactory commandFactory;
 
-    public CommandHandler(NeighborList neighbors, String shareDirPath, MessageSender messageSender) {
+    public CommandProcessor(NeighborList neighbors, String shareDirPath, MessageSender messageSender) {
         this.commandFactory = new CommandFactory(neighbors, shareDirPath, messageSender);
     }
 

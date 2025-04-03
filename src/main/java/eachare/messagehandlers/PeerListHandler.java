@@ -33,6 +33,6 @@ public class PeerListHandler implements MessageHandler {
         }
 
         peerListExecutionTimes--;
-        if (peerListExecutionTimes == 0) CommandHandler.showMenu();
+        if (peerListExecutionTimes == 0) CommandProcessor.showMenu();
     }
 }
