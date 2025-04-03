@@ -1,13 +1,19 @@
-package eachare.requesthandlers;
+package eachare.messagehandlers;
 
 import eachare.Message;
 import eachare.NeighborList;
 import eachare.Peer;
 import eachare.PeerStatus;
 
-public class HelloHandler {
+public class HelloHandler implements MessageHandler {
 
-    public static void execute(Message message, NeighborList neighbors) {
+    private final NeighborList neighbors;
+
+    public HelloHandler(NeighborList neighbors) {
+        this.neighbors = neighbors;
+    }
+
+    public void execute(Message message) {
         if(neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort())) {
             neighbors.updateStatusByAddress(message.getOriginAddress(), message.getOriginPort(), PeerStatus.ONLINE);
         } else {

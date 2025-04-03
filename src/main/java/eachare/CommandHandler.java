@@ -9,11 +9,13 @@ public class CommandHandler {
     private final NeighborList neighbors;
     private final String shareDirPath;
     private final MessageSender messageSender;
+    private final CommandFactory commandFactory;
 
     public CommandHandler(NeighborList neighbors, String shareDirPath, MessageSender messageSender) {
         this.neighbors = neighbors;
         this.shareDirPath = shareDirPath;
         this.messageSender = messageSender;
+        this.commandFactory = new CommandFactory(neighbors, shareDirPath, messageSender);
     }
 
     public void start() {
@@ -23,7 +25,7 @@ public class CommandHandler {
 
         while(true) {
             int commandIdx = sc.nextInt();
-            Command command = getCommand(commandIdx);
+            Command command = commandFactory.createCommand(commandIdx);
 
             if(command == null)
                 System.err.println("Comando não encontrado. Tente novamente.");
@@ -34,23 +36,6 @@ public class CommandHandler {
                 if(commandIdx != 2) showMenu();
             }
         }
-    }
-
-    private Command getCommand(int commandIdx) {
-
-        Command command = null;
-
-        switch(commandIdx) {
-            case 1 -> command = new ListPeers(neighbors, messageSender);
-            case 2 -> command = new GetPeers(neighbors, messageSender);
-            case 3 -> command = new ListLocalFiles(shareDirPath);
-            case 4 -> {}
-            case 5 -> {}
-            case 6 -> {}
-            case 9 -> command = new Bye(neighbors, messageSender);
-        }
-
-        return command;
     }
 
     public static void showMenu() {

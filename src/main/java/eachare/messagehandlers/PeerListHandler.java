@@ -1,14 +1,20 @@
-package eachare.requesthandlers;
+package eachare.messagehandlers;
 
 import eachare.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PeerListHandler {
+public class PeerListHandler implements MessageHandler {
     private static int peerListExecutionTimes = 0;
 
-    public static void execute(Message message, NeighborList neighbors){
+    private final NeighborList neighbors;
+
+    public PeerListHandler(NeighborList neighbors) {
+        this.neighbors = neighbors;
+    }
+
+    public void execute(Message message) {
         List<String> args = new ArrayList<>(message.getArgs());
 
         if (peerListExecutionTimes == 0) peerListExecutionTimes = neighbors.getOnlineNumber();
@@ -28,5 +34,5 @@ public class PeerListHandler {
 
         peerListExecutionTimes--;
         if (peerListExecutionTimes == 0) CommandHandler.showMenu();
-        }
+    }
 }

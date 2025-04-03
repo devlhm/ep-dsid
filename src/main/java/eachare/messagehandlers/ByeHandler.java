@@ -1,12 +1,18 @@
-package eachare.requesthandlers;
+package eachare.messagehandlers;
 
 import eachare.Message;
 import eachare.NeighborList;
 import eachare.PeerStatus;
 
-public class ByeHandler {
+public class ByeHandler implements MessageHandler {
 
-    public static void execute(Message message, NeighborList neighbors){
+    private final NeighborList neighbors;
+
+    public ByeHandler(NeighborList neighbors) {
+        this.neighbors = neighbors;
+    }
+
+    public void execute(Message message){
         if(neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort())) {
             neighbors.updateStatusByAddress(message.getOriginAddress(), message.getOriginPort(), PeerStatus.OFFLINE);
         }

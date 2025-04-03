@@ -1,9 +1,6 @@
 package eachare;
 
-import eachare.requesthandlers.ByeHandler;
-import eachare.requesthandlers.GetPeersHandler;
-import eachare.requesthandlers.HelloHandler;
-import eachare.requesthandlers.PeerListHandler;
+import eachare.messagehandlers.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,8 +14,9 @@ public class Server implements Runnable {
     private final NeighborList neighbors;
     private final Clock clock;
     private final MessageSender messageSender;
+    private final MessageHandlerFactory messageHandlerFactory;
 
-    private static ServerSocket socket;
+    private ServerSocket socket;
 
     public Server(int port, String ipAddress, NeighborList neighbors, Clock clock) {
         this.port = port;
@@ -26,6 +24,7 @@ public class Server implements Runnable {
         this.neighbors = neighbors;
         this.clock = clock;
         this.messageSender = new MessageSender(clock, ipAddress, port);
+        this.messageHandlerFactory = new MessageHandlerFactory(neighbors, messageSender);
     }
 
     public void open() {
@@ -36,7 +35,7 @@ public class Server implements Runnable {
         }
     }
 
-    public static void close() {
+    public void close() {
         try {
             socket.close();
         } catch (IOException e) {
@@ -67,20 +66,8 @@ public class Server implements Runnable {
         showMessage(message);
         clock.increment();
 
-        switch (message.getType()) {
-            case HELLO -> {
-                HelloHandler.execute(message, neighbors);
-            }
-            case GET_PEERS -> {
-                GetPeersHandler.execute(message, messageSender, neighbors);
-            }
-            case BYE -> {
-                ByeHandler.execute(message, neighbors);
-            }
-            case PEER_LIST -> {
-                PeerListHandler.execute(message, neighbors);
-            }
-        }
+        MessageHandler handler = messageHandlerFactory.createHandler(message.getType());
+        handler.execute(message);
     }
 
     private void showMessage (Message message){

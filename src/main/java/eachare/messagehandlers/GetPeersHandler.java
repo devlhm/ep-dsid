@@ -1,4 +1,4 @@
-package eachare.requesthandlers;
+package eachare.messagehandlers;
 
 import eachare.*;
 
@@ -6,9 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class GetPeersHandler {
+public class GetPeersHandler implements MessageHandler {
 
-    public static void execute(Message message, MessageSender messageSender, NeighborList neighbors){
+    private final MessageSender messageSender;
+    private final NeighborList neighbors;
+
+    public GetPeersHandler(MessageSender messageSender, NeighborList neighbors) {
+        this.messageSender = messageSender;
+        this.neighbors = neighbors;
+    }
+
+    public void execute(Message message){
         List<String> args = new ArrayList<>();
 
         if (neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort())) args.addFirst(String.valueOf(neighbors.size() - 1));
