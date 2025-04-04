@@ -32,7 +32,7 @@ public class Main {
         serverThread.start();
 
         CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedDirPath, server.getMessageSender());
-        commandProcessor.start();
+        commandProcessor.run();
 
         server.close();
     }

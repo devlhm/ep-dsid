@@ -12,7 +12,7 @@ public class CommandProcessor {
         this.commandFactory = new CommandFactory(neighbors, shareDirPath, messageSender);
     }
 
-    public void start() {
+    public void run() {
         showMenu();
 
         Scanner sc = new Scanner(System.in);
