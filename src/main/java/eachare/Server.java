@@ -11,7 +11,6 @@ public class Server implements Runnable {
 
     private final int port;
     private final String ipAddress;
-    private final NeighborList neighbors;
     private final Clock clock;
     private final MessageSender messageSender;
     private final MessageHandlerFactory messageHandlerFactory;
@@ -21,7 +20,6 @@ public class Server implements Runnable {
     public Server(int port, String ipAddress, NeighborList neighbors, Clock clock) {
         this.port = port;
         this.ipAddress = ipAddress;
-        this.neighbors = neighbors;
         this.clock = clock;
         this.messageSender = new MessageSender(clock, ipAddress, port);
         this.messageHandlerFactory = new MessageHandlerFactory(neighbors, messageSender);
