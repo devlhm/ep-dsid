@@ -16,6 +16,8 @@ public class MessageSender {
     }
 
     public boolean trySend(Message message, String destinationAddress, int destinationPort) {
+        showMessage(message, destinationAddress, destinationPort);
+
         try (Socket socket = new Socket(destinationAddress, destinationPort)) {
             clock.increment();
 
@@ -23,18 +25,16 @@ public class MessageSender {
             message.setOriginAddress(originAddress);
             message.setOriginPort(originPort);
 
-            showMessage(message, destinationAddress, destinationPort);
-
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            out.write(message.toString());
-            out.flush();
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            out.println(message.toString());
             return true;
         } catch (Exception e) {
+            System.err.println("Erro enviando mensagem para " + destinationAddress + ":" + destinationPort);
             return false;
         }
     }
 
     private void showMessage(Message message, String destinationAddress, int destinationPort){
-        System.out.println("Encaminhando menssagem \"" + message.toString().trim() + "\" para " + destinationAddress + ":" + destinationPort);
+        System.out.println("Encaminhando mensagem \"" + message.toString().trim() + "\" para " + destinationAddress + ":" + destinationPort);
     }
 }

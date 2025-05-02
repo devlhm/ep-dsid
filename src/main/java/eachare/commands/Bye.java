@@ -15,8 +15,8 @@ public class Bye implements Command{
     @Override
     public void execute() {
         System.out.println("Saindo . . .");
-        for (Peer peer : neighbors.getAll()){
-            if (peer.getStatus() == PeerStatus.ONLINE) messageSender.trySend(new Message(MessageType.BYE), peer.getIpAddress(), peer.getPort());
-        }
+        for (Peer peer : neighbors.getAll())
+            if (peer.getStatus() == PeerStatus.ONLINE)
+                messageSender.trySend(new Message(MessageType.BYE), peer.getIpAddress(), peer.getPort());
     }
 }
