@@ -19,12 +19,13 @@ public class GetPeersHandler implements MessageHandler {
     public void execute(Message message){
         List<String> args = new ArrayList<>();
 
-        if (neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort())) args.addFirst(String.valueOf(neighbors.size() - 1));
+        if (neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort()))
+            args.addFirst(String.valueOf(neighbors.size() - 1));
         else args.addFirst(String.valueOf(neighbors.size()));
 
         for (Peer peer : neighbors.getAll()){
             if (!Objects.equals(peer.getIpAddress(), message.getOriginAddress()) || (peer.getPort() != message.getOriginPort())){
-                args.addLast(String.join(":", peer.getIpAddress(), String.valueOf(peer.getPort()), peer.getStatus().name(), "0"));
+                args.addLast(peer.toString());
             }
         }
 

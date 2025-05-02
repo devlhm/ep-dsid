@@ -33,6 +33,15 @@ public class NeighborList {
         System.out.println("Atualizando peer " + address + ":" + port + " status " + status.toString());
     }
 
+    public void updateByAddress(Peer peer) {
+        for(Peer neighbor : neighbors) {
+            if(neighbor.getIpAddress().equals(peer.getIpAddress()) && neighbor.getPort() == peer.getPort()) {
+                neighbor.setStatus(peer.getStatus());
+                neighbor.setClockValue(peer.getClockValue());
+            }
+        }
+    }
+
     public boolean containsAddress(String address, int port) {
         for(Peer neighbor : neighbors) {
             if(neighbor.getIpAddress().equals(address) && neighbor.getPort() == port)
@@ -40,6 +49,21 @@ public class NeighborList {
         }
 
         return false;
+    }
+
+    public Peer getByAddress(String address, int port) {
+        for(Peer neighbor : neighbors) {
+            if(neighbor.getIpAddress().equals(address) && neighbor.getPort() == port)
+                return neighbor;
+        }
+
+        return null;
+    }
+
+    public void onMessageReceived(Message message) {
+        Peer sender = getByAddress(message.getOriginAddress(), message.getOriginPort());
+        if(sender != null)
+            sender.onMessageReceived(message);
     }
 
     public int getOnlineNumber (){

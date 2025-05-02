@@ -1,8 +1,5 @@
 package eachare;
 
-import eachare.clock.BasicClock;
-import eachare.clock.Clock;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -32,7 +29,7 @@ public class Main {
         NeighborList neighbors = getInitialNeighbors(peersFilePath);
         validateDirectory(sharedDirPath);
 
-        Clock clock = new BasicClock();
+        Clock clock = new Clock();
 
         Server server = new Server(socketPort, socketAddress, neighbors, clock);
 

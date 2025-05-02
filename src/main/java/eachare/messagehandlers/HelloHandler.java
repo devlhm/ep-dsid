@@ -14,10 +14,8 @@ public class HelloHandler implements MessageHandler {
     }
 
     public void execute(Message message) {
-        if(neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort())) {
-            neighbors.updateStatusByAddress(message.getOriginAddress(), message.getOriginPort(), PeerStatus.ONLINE);
-        } else {
-            Peer peer = new Peer(message.getOriginAddress(), message.getOriginPort(), PeerStatus.ONLINE);
+        if(!neighbors.containsAddress(message.getOriginAddress(), message.getOriginPort())) {
+            Peer peer = new Peer(message.getOriginAddress(), message.getOriginPort(), PeerStatus.ONLINE, message.getClockValue());
             neighbors.add(peer);
         }
     }

@@ -1,6 +1,5 @@
 package eachare;
 
-import eachare.clock.Clock;
 import eachare.messagehandlers.*;
 
 import java.io.BufferedReader;
@@ -15,6 +14,7 @@ public class Server implements Runnable {
     private final Clock clock;
     private final MessageSender messageSender;
     private final MessageHandlerFactory messageHandlerFactory;
+    private final NeighborList neighbors;
 
     private ServerSocket socket;
 
@@ -24,6 +24,7 @@ public class Server implements Runnable {
         this.clock = clock;
         this.messageSender = new MessageSender(clock, ipAddress, port);
         this.messageHandlerFactory = new MessageHandlerFactory(neighbors, messageSender);
+        this.neighbors = neighbors;
     }
 
     public void open() {
@@ -76,9 +77,11 @@ public class Server implements Runnable {
 
         showMessage(message);
         clock.onReceiveMessage(message);
+        neighbors.onMessageReceived(message);
 
         MessageHandler handler = messageHandlerFactory.createHandler(message.getType());
-        handler.execute(message);
+        if(handler != null)
+            handler.execute(message);
     }
 
     private void showMessage (Message message){

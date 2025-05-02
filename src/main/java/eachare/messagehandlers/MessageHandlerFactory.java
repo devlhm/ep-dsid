@@ -18,8 +18,8 @@ public class MessageHandlerFactory {
         return switch(type) {
             case HELLO -> new HelloHandler(neighbors);
             case GET_PEERS -> new GetPeersHandler(messageSender, neighbors);
-            case BYE -> new ByeHandler(neighbors);
             case PEER_LIST -> new PeerListHandler(neighbors);
-        };
+			default -> null;
+		};
     }
 }

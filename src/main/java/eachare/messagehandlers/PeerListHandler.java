@@ -20,15 +20,19 @@ public class PeerListHandler implements MessageHandler {
         if (peerListExecutionTimes == 0) peerListExecutionTimes = neighbors.getOnlineNumber();
         args.removeFirst();
 
-        neighbors.updateStatusByAddress(message.getOriginAddress(), message.getOriginPort(), PeerStatus.ONLINE);
-
         for (String string : args) {
-            String[] peersData = string.split(":");
+            try {
+                Peer receivedPeer = new Peer(string);
+                Peer localPeer = neighbors.getByAddress(receivedPeer.getIpAddress(), receivedPeer.getPort());
 
-            if (neighbors.containsAddress(peersData[0], Integer.parseInt(peersData[1]))) {
-                neighbors.updateStatusByAddress(peersData[0], Integer.parseInt(peersData[1]), PeerStatus.valueOf(peersData[2]));
-            } else {
-                neighbors.add(new Peer(peersData[0], Integer.parseInt(peersData[1]), PeerStatus.valueOf(peersData[2])));
+                if (localPeer != null) {
+                    if (localPeer.getClockValue() < receivedPeer.getClockValue()) {
+                        neighbors.updateByAddress(receivedPeer);
+                    }
+                } else
+                    neighbors.add(receivedPeer);
+            } catch(Exception ex) {
+                System.err.println(ex.getMessage());
             }
         }
 

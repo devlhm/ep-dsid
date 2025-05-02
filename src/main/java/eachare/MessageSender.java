@@ -1,7 +1,5 @@
 package eachare;
 
-import eachare.clock.Clock;
-
 import java.io.*;
 import java.net.Socket;
 
@@ -28,7 +26,7 @@ public class MessageSender {
             message.setOriginPort(originPort);
 
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println(message.toString());
+            out.println(message);
             return true;
         } catch (Exception e) {
             System.err.println("Erro enviando mensagem para " + destinationAddress + ":" + destinationPort);
