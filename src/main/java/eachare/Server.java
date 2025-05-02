@@ -1,5 +1,6 @@
 package eachare;
 
+import eachare.clock.Clock;
 import eachare.messagehandlers.*;
 
 import java.io.BufferedReader;
@@ -74,7 +75,7 @@ public class Server implements Runnable {
     private void onMessageReceived(Message message) {
 
         showMessage(message);
-        clock.increment();
+        clock.onReceiveMessage(message);
 
         MessageHandler handler = messageHandlerFactory.createHandler(message.getType());
         handler.execute(message);

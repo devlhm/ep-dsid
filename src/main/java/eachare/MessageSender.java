@@ -1,5 +1,7 @@
 package eachare;
 
+import eachare.clock.Clock;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -19,7 +21,7 @@ public class MessageSender {
         showMessage(message, destinationAddress, destinationPort);
 
         try (Socket socket = new Socket(destinationAddress, destinationPort)) {
-            clock.increment();
+            clock.onSendMessage(message);
 
             message.setClockValue(clock.getValue());
             message.setOriginAddress(originAddress);
