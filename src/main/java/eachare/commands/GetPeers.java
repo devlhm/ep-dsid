@@ -14,8 +14,11 @@ public class GetPeers implements Command {
 
     @Override
     public void execute() {
-        for (Peer peer : neighbors.getAll()) {
-            messageSender.trySend(new Message(MessageType.GET_PEERS), peer.getIpAddress(), peer.getPort());
+        if(neighbors.size() == 0) {
+            System.out.println("Nenhum vizinho conhecido.");
+            CommandProcessor.showMenu();
         }
+        else for (Peer peer : neighbors.getAll())
+            messageSender.trySend(new Message(MessageType.GET_PEERS), peer.getIpAddress(), peer.getPort());
     }
 }
