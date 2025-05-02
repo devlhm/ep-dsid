@@ -14,6 +14,12 @@ public class Main {
         }
 
         String[] socketParams = args[0].split(":");
+
+        if (socketParams.length != 2) {
+            System.out.println("Endereço deve estar no formato <ip>:<porta>");
+            System.exit(1);
+        }
+
         String socketAddress = socketParams[0];
         int socketPort = Integer.parseInt(socketParams[1]);
 
@@ -26,6 +32,9 @@ public class Main {
         Clock clock = new Clock();
 
         Server server = new Server(socketPort, socketAddress, neighbors, clock);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(server::close));
+
         server.open();
 
         Thread serverThread = new Thread(server);
@@ -35,11 +44,13 @@ public class Main {
         commandProcessor.run();
 
         server.close();
+        try {
+            serverThread.join();
+        } catch (InterruptedException ignored) {}
     }
 
     private static NeighborList getInitialNeighbors(String peersFilePath) {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(peersFilePath));
+        try(BufferedReader br = new BufferedReader(new FileReader(peersFilePath))) {
 
             NeighborList neighbors = new NeighborList();
 
@@ -47,9 +58,19 @@ public class Main {
 
             while(line != null) {
                 String[] peerParams = line.split(":");
-                Peer neighbor = new Peer(peerParams[0], Integer.parseInt(peerParams[1]));
-                neighbors.add(neighbor);
-                line = br.readLine();
+
+                if (peerParams.length != 2) {
+                    System.err.println("Linha inválida no arquivo de vizinhos: " + line);
+                    continue;
+                }
+
+                try {
+                    Peer neighbor = new Peer(peerParams[0], Integer.parseInt(peerParams[1]));
+                    neighbors.add(neighbor);
+                    line = br.readLine();
+                } catch(NumberFormatException ex) {
+                    System.err.println("Erro ao converter a porta " + peerParams[1] + " para inteiro.");
+                }
             }
 
             return neighbors;

@@ -46,11 +46,23 @@ public class Server implements Runnable {
         while(!socket.isClosed()) {
             try {
                 Socket client = socket.accept();
-                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                new Thread(() -> {
+					try (
+                            Socket c = client;
+                            BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream()))
+                    ) {
+                        String line = in.readLine();
 
-                onMessageReceived(new Message(in.readLine()));
+                        if(line != null)
+						    onMessageReceived(new Message(line));
+
+					} catch (IOException e) {
+                        System.err.println("Erro ao ler mensagem: " + e.getMessage());
+					}
+				}).start();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                if(!socket.isClosed())
+                    System.err.println("Erro ao aceitar conexão: " + e.getMessage());
             }
         }
     }

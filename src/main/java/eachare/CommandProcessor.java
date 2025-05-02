@@ -2,6 +2,7 @@ package eachare;
 
 import eachare.commands.*;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class CommandProcessor {
@@ -18,16 +19,20 @@ public class CommandProcessor {
         Scanner sc = new Scanner(System.in);
 
         while(true) {
-            int commandIdx = sc.nextInt();
-            Command command = commandFactory.createCommand(commandIdx);
+            try {
+                int commandIdx = sc.nextInt();
+                Command command = commandFactory.createCommand(commandIdx);
 
-            if(command == null)
-                System.err.println("Comando não encontrado. Tente novamente.");
-            else {
-                command.execute();
-                if(commandIdx == 9)
-                    break;
-                if(commandIdx != 2) showMenu();
+                if(command == null)
+                    System.err.println("Comando não encontrado. Tente novamente.");
+                else {
+                    command.execute();
+                    if(commandIdx == 9)
+                        break;
+                    if(commandIdx != 2) showMenu();
+                }
+            } catch(InputMismatchException ex) {
+                System.err.println("Entrada inválida. Digite um número.");
             }
         }
     }
