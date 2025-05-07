@@ -23,7 +23,7 @@ public class Message {
 
     public Message(String encoded) {
         try {
-            if (!encoded.contains("PEER_LIST")) {
+            if (!encoded.contains("PEER_LIST") && !encoded.contains("LS_LIST") && !encoded.contains("DL") && !encoded.contains("FILE")) {
                 String[] messageParams = encoded.split("[: ]+");
 
                 this.originAddress = messageParams[0];

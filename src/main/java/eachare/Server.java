@@ -18,12 +18,12 @@ public class Server implements Runnable {
 
     private ServerSocket socket;
 
-    public Server(int port, String ipAddress, NeighborList neighbors, Clock clock) {
+    public Server(int port, String ipAddress, NeighborList neighbors, Clock clock, SharedFiles sharedFiles) {
         this.port = port;
         this.ipAddress = ipAddress;
         this.clock = clock;
         this.messageSender = new MessageSender(clock, ipAddress, port);
-        this.messageHandlerFactory = new MessageHandlerFactory(neighbors, messageSender);
+        this.messageHandlerFactory = new MessageHandlerFactory(neighbors, messageSender, sharedFiles);
         this.neighbors = neighbors;
     }
 
@@ -85,7 +85,9 @@ public class Server implements Runnable {
     }
 
     private void showMessage (Message message){
-        if(message.getType() != MessageType.PEER_LIST) System.out.println("Mensagem recebida: \"" + message.toString().trim() + "\"");
+        if(message.getType() != MessageType.PEER_LIST && message.getType() != MessageType.LS_LIST && message.getType() != MessageType.FILE) {
+            System.out.println("Mensagem recebida: \"" + message.toString().trim() + "\"");
+        }
         else System.out.println("Resposta recebida: \"" + message.toString().trim() + "\"");
     }
 }

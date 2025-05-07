@@ -16,7 +16,6 @@ public class MessageSender {
     }
 
     public boolean trySend(Message message, String destinationAddress, int destinationPort) {
-        showMessage(message, destinationAddress, destinationPort);
 
         try (Socket socket = new Socket(destinationAddress, destinationPort)) {
             clock.onSendMessage(message);
@@ -24,6 +23,8 @@ public class MessageSender {
             message.setClockValue(clock.getValue());
             message.setOriginAddress(originAddress);
             message.setOriginPort(originPort);
+
+            showMessage(message, destinationAddress, destinationPort);
 
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             out.println(message);

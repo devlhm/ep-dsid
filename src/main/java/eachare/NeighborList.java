@@ -29,8 +29,6 @@ public class NeighborList {
             if(neighbor.getIpAddress().equals(address) && neighbor.getPort() == port)
                 neighbor.setStatus(status);
         }
-
-        System.out.println("Atualizando peer " + address + ":" + port + " status " + status.toString());
     }
 
     public void updateByAddress(Peer peer) {

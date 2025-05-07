@@ -1,7 +1,6 @@
 package eachare;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -24,27 +23,35 @@ public class Main {
         int socketPort = Integer.parseInt(socketParams[1]);
 
         String peersFilePath = args[1];
-        String sharedDirPath = args[2];
+        SharedFiles sharedFiles = new SharedFiles(args[2]);
 
         NeighborList neighbors = getInitialNeighbors(peersFilePath);
-        validateDirectory(sharedDirPath);
 
         Clock clock = new Clock();
 
-        Server server = new Server(socketPort, socketAddress, neighbors, clock);
+        Server server = new Server(socketPort, socketAddress, neighbors, clock, sharedFiles);
+        DirectoryWatcher dirWhatcher = new DirectoryWatcher(sharedFiles);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(server::close));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            dirWhatcher.stop();
+            server.close();
+        }));
 
         server.open();
 
+        Thread watcherThread = new Thread(dirWhatcher);
         Thread serverThread = new Thread(server);
+
+        watcherThread.start();
         serverThread.start();
 
-        CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedDirPath, server.getMessageSender());
+        CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedFiles, server.getMessageSender());
         commandProcessor.run();
 
+        dirWhatcher.stop();
         server.close();
         try {
+            watcherThread.join();
             serverThread.join();
         } catch (InterruptedException ignored) {}
     }
@@ -79,14 +86,6 @@ public class Main {
             System.err.println("Arquivo de vizinhos nao encontrado ou erro na leitura!");
             System.exit(1);
             return null;
-        }
-    }
-
-    private static void validateDirectory(String shareDirPath) {
-        File directory = new File(shareDirPath);
-        if (!directory.exists() || !directory.isDirectory()) {
-            System.err.println("Erro: O diretório '" + shareDirPath + "' não é válido.");
-            System.exit(1);
         }
     }
 }

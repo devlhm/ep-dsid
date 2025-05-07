@@ -9,8 +9,8 @@ public class CommandProcessor {
 
     private final CommandFactory commandFactory;
 
-    public CommandProcessor(NeighborList neighbors, String shareDirPath, MessageSender messageSender) {
-        this.commandFactory = new CommandFactory(neighbors, shareDirPath, messageSender);
+    public CommandProcessor(NeighborList neighbors, SharedFiles sharedFiles, MessageSender messageSender) {
+        this.commandFactory = new CommandFactory(neighbors, sharedFiles, messageSender);
     }
 
     public void run() {
@@ -29,7 +29,7 @@ public class CommandProcessor {
                     command.execute();
                     if(commandIdx == 9)
                         break;
-                    if(commandIdx != 2) showMenu();
+                    if(commandIdx != 2 && commandIdx != 4) showMenu();
                 }
             } catch(InputMismatchException ex) {
                 System.err.println("Entrada inválida. Digite um número.");
