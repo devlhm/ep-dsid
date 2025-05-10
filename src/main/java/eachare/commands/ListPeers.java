@@ -37,7 +37,7 @@ public class ListPeers implements Command {
 
                     printNeighbors();
                 } else {
-                    System.out.println("Indice inválido! Escolha um número entre 1 e " + neighbors.getAll().size());
+                    System.out.println("Indice inválido! Escolha um número entre 0 e " + neighbors.getAll().size());
                 }
             } else {
                 System.out.println("Entrada inválida! Digite um número.");

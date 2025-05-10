@@ -29,13 +29,10 @@ public class DirectoryWatcher implements Runnable {
 
                         if (!fileName.toString().endsWith("~")) {
                             if (kind == ENTRY_CREATE) {
-                                System.out.println("Arquivo criado: " + fileName);
                                 sharedFiles.addFile(fileName);
                             } else if (kind == ENTRY_MODIFY) {
-                                System.out.println("Arquivo modificado: " + fileName);
                                 sharedFiles.updateFile(fileName);
                             } else if (kind == ENTRY_DELETE) {
-                                System.out.println("Arquivo excluído: " + fileName);
                                 sharedFiles.removeFile(fileName);
                             }
                         }

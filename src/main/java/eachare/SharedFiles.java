@@ -25,7 +25,7 @@ public class SharedFiles {
 
     public void getAllFilesName (){
         for (File file : files) {
-            System.out.println(file.getName() + " " + file.length());
+            System.out.println(file.getName());
         }
     }
 
