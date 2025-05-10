@@ -15,6 +15,10 @@ public class Base64FileUtils {
 
     // Decodifica o conteúdo Base64 e grava em um arquivo
     public static void decodeBase64ToFile(String base64Content, Path outputPath) throws IOException {
+        if (base64Content == null || base64Content.isEmpty()) {
+            Files.createFile(outputPath);
+            return;
+        }
         byte[] fileBytes = Base64.getDecoder().decode(base64Content);
         Files.write(outputPath, fileBytes);
     }

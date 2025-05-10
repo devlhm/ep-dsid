@@ -19,7 +19,7 @@ public class RecivedFileHandler implements MessageHandler {
 
         String filePath = sharedFiles.getSharedDirPath() + "/" + fileName;
 
-        String encodedFile = message.getArgs().getLast();
+        String encodedFile = message.getArgs().size() > 3 ? message.getArgs().get(3) : null;
 
         try {
             Base64FileUtils.decodeBase64ToFile(encodedFile, Path.of(filePath));
