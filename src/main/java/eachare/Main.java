@@ -30,16 +30,16 @@ public class Main {
         Clock clock = new Clock();
 
         Server server = new Server(socketPort, socketAddress, neighbors, clock, sharedFiles);
-        DirectoryWatcher dirWhatcher = new DirectoryWatcher(sharedFiles);
+        DirectoryWatcher dirWatcher = new DirectoryWatcher(sharedFiles);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            dirWhatcher.stop();
+            dirWatcher.stop();
             server.close();
         }));
 
         server.open();
 
-        Thread watcherThread = new Thread(dirWhatcher);
+        Thread watcherThread = new Thread(dirWatcher);
         Thread serverThread = new Thread(server);
 
         watcherThread.start();
@@ -48,7 +48,7 @@ public class Main {
         CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedFiles, server.getMessageSender());
         commandProcessor.run();
 
-        dirWhatcher.stop();
+        dirWatcher.stop();
         server.close();
         try {
             watcherThread.join();
