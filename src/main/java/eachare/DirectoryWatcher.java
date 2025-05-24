@@ -6,7 +6,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 public class DirectoryWatcher implements Runnable {
     private final SharedFiles sharedFiles;
-    private volatile boolean runnig = true;
+    private volatile boolean running = true;
     private WatchService watchService;
 
     public DirectoryWatcher(SharedFiles sharedFiles) {
@@ -20,7 +20,7 @@ public class DirectoryWatcher implements Runnable {
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
             path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
             this.watchService = watchService;
-            while (runnig) {
+            while (running) {
                 try {
                     WatchKey key = watchService.take();
                     for (WatchEvent<?> event : key.pollEvents()) {
@@ -53,7 +53,7 @@ public class DirectoryWatcher implements Runnable {
         }
     }
         public void stop() {
-        runnig = false;
+        running = false;
         try {
             watchService.close();
         } catch (IOException e) {
