@@ -85,7 +85,11 @@ public class Message {
                 .append(" ").append(clockValue)
                 .append(" ").append(type.toString());
 
-        for(String arg : args) {
+        for (int i = 0; i < args.size(); i++) {
+            String arg = args.get(i);
+            if (i == 3 && arg.length() > 22) {
+                arg = arg.substring(0, 22);
+            }
             sb.append(" ").append(arg);
         }
 
