@@ -1,16 +1,19 @@
 package eachare;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class NetworkFile {
     private final File file;
-    private final Peer sender;
+    private final List<Peer> senders; // List of peers that have this file
     private final Long fileSize;
 
     public NetworkFile(File file, Peer sender, Long fileSize) {
         this.file = file;
-        this.sender = sender;
+        this.senders = new ArrayList<>();
+        this.senders.add(sender);
         this.fileSize = fileSize;
     }
 
@@ -32,12 +35,24 @@ public class NetworkFile {
     }
 
     public Peer getPeer() {
-        return sender;
+        return senders.getFirst();
     }
 
     public Long getFileSize() {
         return fileSize;
     }
 
+    public String getFileName() {
+        return file.getName();
+    }
 
+    public void addSender(Peer sender) {
+        if (!senders.contains(sender)) {
+            senders.add(sender);
+        }
+    }
+
+    public List<Peer> getSenders() {
+        return senders;
+    }
 }

@@ -3,17 +3,19 @@ package eachare;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SharedFiles {
 
     private final List<File> files = new ArrayList<>(); // local files
     private final List<NetworkFile> networkFiles; // shared files
-    private int peersNumberShareFiles = 0; // number of peers who shared files
+    private final java.util.concurrent.atomic.AtomicInteger peersNumberShareFiles =
+            new java.util.concurrent.atomic.AtomicInteger(0); // número de peers que compartilharam arquivos
     private final String sharedDirPath;
 
     public SharedFiles(String sharedDirPath) {
-        this.networkFiles = new ArrayList<>();
+        this.networkFiles = Collections.synchronizedList(new ArrayList<>());
         this.sharedDirPath = sharedDirPath;
 
         getInitialFiles();
@@ -70,27 +72,37 @@ public class SharedFiles {
     }
 
     public List<NetworkFile> getNetworkFiles() {
-        return networkFiles;
+        synchronized (networkFiles) {
+            return new ArrayList<>(networkFiles);
+        }
     }
 
-    public void addNetworkFile(NetworkFile file) {
-            networkFiles.add(file);
+    public void addNetworkFile(String fileName, Peer sender, Long fileSize) {
+        synchronized (networkFiles) {
+            for (NetworkFile networkFile : networkFiles) {
+                if (networkFile.getFileName().equals(fileName) && networkFile.getFileSize().equals(fileSize)) {
+                    networkFile.addSender(sender);
+                    return;
+                }
+            }
+            networkFiles.add(new NetworkFile(new File(fileName), sender, fileSize));
+        }
     }
 
     public void clearNetworkFiles() {
         networkFiles.clear();
     }
 
-    public int getPeersNumberShareFiles() {
-        return peersNumberShareFiles;
-    }
-
     public void setPeersNumberShareFiles(int peersNumberShareFiles) {
-        this.peersNumberShareFiles = peersNumberShareFiles;
+        this.peersNumberShareFiles.set(peersNumberShareFiles);
     }
 
-    public void decrementPeersNumberShareFiles() {
-        this.peersNumberShareFiles--;
+    public int decrementAndGetPeersNumberShareFiles() {
+        return this.peersNumberShareFiles.decrementAndGet();
+    }
+
+    public boolean initializeCounterIfZero(int expectedPeers) {
+        return this.peersNumberShareFiles.compareAndSet(0, expectedPeers);
     }
 
     public File getFileByName(String fileName) {

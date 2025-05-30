@@ -28,13 +28,18 @@ public class Main {
         NeighborList neighbors = getInitialNeighbors(peersFilePath);
 
         Clock clock = new Clock();
+        Chunk chunk = new Chunk();
 
-        Server server = new Server(socketPort, socketAddress, neighbors, clock, sharedFiles);
+        MessageSender messageSender = new MessageSender(clock, socketAddress, socketPort);
+        DownloadManager downloadManager = new DownloadManager(sharedFiles);
+
+        Server server = new Server(socketPort, socketAddress, neighbors, clock, sharedFiles, downloadManager, messageSender);
         DirectoryWatcher dirWatcher = new DirectoryWatcher(sharedFiles);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             dirWatcher.stop();
             server.close();
+            messageSender.closeAllConnections();
         }));
 
         server.open();
@@ -45,15 +50,19 @@ public class Main {
         watcherThread.start();
         serverThread.start();
 
-        CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedFiles, server.getMessageSender());
+        CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedFiles, server.getMessageSender(), chunk, downloadManager);
         commandProcessor.run();
 
         dirWatcher.stop();
         server.close();
+        messageSender.closeAllConnections();
+
         try {
-            watcherThread.join();
-            serverThread.join();
-        } catch (InterruptedException ignored) {}
+            watcherThread.join(5000);
+            serverThread.join(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static NeighborList getInitialNeighbors(String peersFilePath) {

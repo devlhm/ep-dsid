@@ -17,31 +17,30 @@ public class ListSharedFilesHandler implements MessageHandler{
     public void execute(Message message) {
         List<String> args = message.getArgs();
         args.removeFirst();
+        sharedFiles.initializeCounterIfZero(neighbors.getOnlineNumber());
 
-        if (sharedFiles.getPeersNumberShareFiles() == 0) {
-            sharedFiles.setPeersNumberShareFiles(neighbors.getOnlineNumber());
-        }
-
-        sharedFiles.decrementPeersNumberShareFiles();
+        int countAfterDecrement = sharedFiles.decrementAndGetPeersNumberShareFiles();
 
         Peer sender = neighbors.getByAddress(message.getOriginAddress(), message.getOriginPort());
-
         for (String arg : args) {
             try {
                 String[] fileData = arg.split(":");
                 String fileName = fileData[0];
                 long fileSize = Long.parseLong(fileData[1]);
-
-                File file = new File(fileName);
-                NetworkFile networkFile = new NetworkFile(file, sender, fileSize);
-                sharedFiles.addNetworkFile(networkFile);
+                sharedFiles.addNetworkFile(fileName, sender, fileSize);
             } catch (Exception e) {
-                System.err.println("Erro ao processar o arquivo recebido: " + e.getMessage());
+                System.err.println("Erro ao processar o arquivo recebido do peer "
+                        + (sender != null ? sender.getIpAddress() + ":" + sender.getPort() : "desconhecido")
+                        + " para o argumento '" + arg + "': " + e.getMessage());
+                e.printStackTrace(System.err);
             }
         }
 
-        if (sharedFiles.getPeersNumberShareFiles() == 0) {
+        if (countAfterDecrement == 0) {
             showNetworkFiles(sharedFiles.getNetworkFiles());
+        } else if (countAfterDecrement < 0) {
+            System.err.println("Alerta: Contador de peers ficou negativo (" + countAfterDecrement + ").");
+            sharedFiles.setPeersNumberShareFiles(0);
         }
     }
 
@@ -52,17 +51,21 @@ public class ListSharedFilesHandler implements MessageHandler{
         String formatHeader = "%-" + maxIndexWidth + "s %-20s | %-8s | %s%n";
         String formatRow = "%-" + maxIndexWidth + "s %-20s | %-8d | %s%n";
 
-        System.out.printf(formatHeader, "", "Nome", "Tamanho", "Peer");
+        System.out.printf(formatHeader, "", "Nome", "Tamanho", "Peers");
         System.out.printf(formatHeader, "[0]", "<Cancelar>", "", "");
 
         int index = 1;
         for (NetworkFile arquivo : arquivos) {
+            String peers = arquivo.getSenders().stream()
+                    .map(sender -> sender.getIpAddress() + ":" + sender.getPort())
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("");
             System.out.printf(
                     formatRow,
                     "[" + index++ + "]",
                     arquivo.getFile().getName(),
                     arquivo.getFileSize(),
-                    arquivo.getPeer().getIpAddress() + ":" + arquivo.getPeer().getPort()
+                    peers
             );
         }
 

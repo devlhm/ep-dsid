@@ -1,20 +1,19 @@
 package eachare.messagehandlers;
 
-import eachare.MessageSender;
-import eachare.MessageType;
-import eachare.NeighborList;
-import eachare.SharedFiles;
+import eachare.*;
 
 public class MessageHandlerFactory {
 
     private final NeighborList neighbors;
     private final MessageSender messageSender;
     private final SharedFiles sharedFiles;
+    private final DownloadManager downloadManager;
 
-    public MessageHandlerFactory(NeighborList neighbors, MessageSender messageSender, SharedFiles sharedFiles) {
+    public MessageHandlerFactory(NeighborList neighbors, MessageSender messageSender, SharedFiles sharedFiles, DownloadManager downloadManager) {
         this.neighbors = neighbors;
         this.messageSender = messageSender;
         this.sharedFiles = sharedFiles;
+        this.downloadManager = downloadManager;
     }
 
     public MessageHandler createHandler(MessageType type) {
@@ -25,7 +24,7 @@ public class MessageHandlerFactory {
             case LS -> new SearchFilesHandler(sharedFiles, messageSender);
             case LS_LIST -> new ListSharedFilesHandler(sharedFiles, neighbors);
             case DL -> new DownloadHandler(sharedFiles, messageSender);
-            case FILE -> new RecivedFileHandler(sharedFiles);
+            case FILE -> new RecivedFileHandler(sharedFiles, downloadManager);
 			default -> null;
 		};
     }

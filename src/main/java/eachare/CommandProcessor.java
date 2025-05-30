@@ -9,8 +9,8 @@ public class CommandProcessor {
 
     private final CommandFactory commandFactory;
 
-    public CommandProcessor(NeighborList neighbors, SharedFiles sharedFiles, MessageSender messageSender) {
-        this.commandFactory = new CommandFactory(neighbors, sharedFiles, messageSender);
+    public CommandProcessor(NeighborList neighbors, SharedFiles sharedFiles, MessageSender messageSender, Chunk chunk, DownloadManager downloadManager) {
+        this.commandFactory = new CommandFactory(neighbors, sharedFiles, messageSender, chunk, downloadManager);
     }
 
     public void run() {

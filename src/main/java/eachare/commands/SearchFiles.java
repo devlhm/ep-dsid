@@ -10,11 +10,16 @@ public class SearchFiles implements Command{
     private final NeighborList neighbors;
     private final MessageSender messageSender;
     private final SharedFiles sharedFiles;
+    private final Chunk chunk;
+    private final DownloadManager downloadManager;
 
-    public SearchFiles(NeighborList neighbors, MessageSender messageSender, SharedFiles sharedFiles) {
+
+    public SearchFiles(NeighborList neighbors, MessageSender messageSender, SharedFiles sharedFiles, Chunk chunk, DownloadManager downloadManager) {
         this.neighbors = neighbors;
         this.messageSender = messageSender;
         this.sharedFiles = sharedFiles;
+        this.chunk = chunk;
+        this.downloadManager = downloadManager;
     }
 
     @Override
@@ -24,11 +29,16 @@ public class SearchFiles implements Command{
             CommandProcessor.showMenu();
             return;
         }
+
+        sharedFiles.clearNetworkFiles();
+
         for (Peer peer : neighbors.getAll()) {
             if (peer.getStatus() == PeerStatus.ONLINE) {
                 messageSender.trySend(new Message(MessageType.LS), peer.getIpAddress(), peer.getPort());
             }
         }
+
+        sharedFiles.setPeersNumberShareFiles(neighbors.getOnlineNumber());
 
         startDownloadSelection();
     }
@@ -36,31 +46,90 @@ public class SearchFiles implements Command{
     private void startDownloadSelection() {
 
         Scanner sc = new Scanner(System.in);
+        NetworkFile selectedFile;
+        List<NetworkFile> currentNetworkFiles;
 
-        int selectedIndex = sc.nextInt();
+        while (true) {
+            try {
+                if (!sc.hasNextLine()) {
+                    System.err.println("Nenhuma entrada detectada. Retornando ao menu.");
+                    CommandProcessor.showMenu();
+                    return;
+                }
+                String lineInput = sc.nextLine();
+                int selectedIndex = Integer.parseInt(lineInput.trim());
 
-        if (selectedIndex == 0) {
+                if (selectedIndex == 0) {
+                    sharedFiles.clearNetworkFiles();
+                    CommandProcessor.showMenu();
+                    return;
+                }
+
+                currentNetworkFiles = sharedFiles.getNetworkFiles();
+                if (selectedIndex > 0 && selectedIndex <= currentNetworkFiles.size()) {
+                    selectedFile = currentNetworkFiles.get(selectedIndex - 1);
+                    break;
+                } else {
+                    System.err.println("Seleção inválida. Tente novamente. Arquivos disponíveis: " + currentNetworkFiles.size());
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Entrada inválida. Por favor, digite um número.");
+            } catch (IndexOutOfBoundsException e) {
+                System.err.println("Número selecionado fora do intervalo. Tente novamente.");
+            }
+        }
+
+        if (selectedFile == null) {
+            CommandProcessor.showMenu();
+            return;
+        }
+
+        System.out.println("Arquivo escolhido " + selectedFile.getFileName());
+
+        long fileSize = selectedFile.getFileSize();
+        long chunkSizeLong = chunk.getChunkSize();
+        long totalChunks;
+
+        if (fileSize == 0) {
+            totalChunks = 1;
+        } else {
+            totalChunks = (fileSize + chunkSizeLong - 1) / chunkSizeLong;
+            if (totalChunks == 0 && fileSize > 0) {
+                totalChunks = 1;
+            }
+        }
+
+        downloadManager.prepareDownload(selectedFile.getFileName(), fileSize, (int) totalChunks);
+
+        List<Peer> peersList = selectedFile.getSenders();
+        if (peersList.isEmpty()) {
+            System.err.println("Nenhum peer disponível para baixar o arquivo: " + selectedFile.getFileName());
             sharedFiles.clearNetworkFiles();
             CommandProcessor.showMenu();
             return;
         }
 
-        if (selectedIndex < 1 || selectedIndex > sharedFiles.getNetworkFiles().size()) {
-            System.out.println("Seleção inválida. Tente novamente.");
-            startDownloadSelection();
-            return;
+        int peerListIndex = 0;
+        for (int currentChunkIndex = 0; currentChunkIndex < totalChunks; currentChunkIndex++) {
+            Peer peer = peersList.get(peerListIndex % peersList.size());
+
+            List<String> dlArgs = new ArrayList<>();
+            dlArgs.add(selectedFile.getFileName());
+            dlArgs.add(String.valueOf(chunkSizeLong));
+            dlArgs.add(String.valueOf(currentChunkIndex));
+
+            messageSender.trySend(new Message(MessageType.DL, dlArgs), peer.getIpAddress(), peer.getPort());
+            peerListIndex++;
         }
 
-        List<String> args = new ArrayList<>();
-
-        NetworkFile selectedFile = sharedFiles.getNetworkFiles().get(selectedIndex - 1);
-
-        System.out.println("Arquivo escolhido " + selectedFile.getFile().getName());
-
-        args.addFirst(selectedFile.getFile().getName());
-        args.add("0");
-        args.add("0");
-
-        messageSender.trySend(new Message(MessageType.DL, args), selectedFile.getPeer().getIpAddress(), selectedFile.getPeer().getPort());
+        try {
+            downloadManager.awaitCurrentDownloadCompletion();
+        } catch (InterruptedException e) {
+            System.err.println("Espera pelo download do arquivo " + selectedFile.getFileName() + " foi interrompida.");
+            Thread.currentThread().interrupt();
+        } finally {
+            sharedFiles.clearNetworkFiles();
+            CommandProcessor.showMenu();
+        }
     }
 }
