@@ -101,8 +101,8 @@ public class SharedFiles {
         return this.peersNumberShareFiles.decrementAndGet();
     }
 
-    public boolean initializeCounterIfZero(int expectedPeers) {
-        return this.peersNumberShareFiles.compareAndSet(0, expectedPeers);
+    public void initializeCounterIfZero(int expectedPeers) {
+        this.peersNumberShareFiles.compareAndSet(0, expectedPeers);
     }
 
     public File getFileByName(String fileName) {

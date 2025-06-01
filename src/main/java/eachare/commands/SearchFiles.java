@@ -41,29 +41,36 @@ public class SearchFiles implements Command{
 
         sharedFiles.setPeersNumberShareFiles(neighbors.getOnlineNumber());
 
-        startDownloadSelection();
+        NetworkFile selectedFile = selectFileToDownload();
+
+        if(selectedFile == null) {
+            CommandProcessor.showMenu();
+            return;
+        }
+
+        System.out.println("Arquivo escolhido " + selectedFile.getFileName());
+
+        downloadFile(selectedFile);
     }
 
-    private void startDownloadSelection() {
+    private NetworkFile selectFileToDownload() {
 
         Scanner sc = new Scanner(System.in);
-        NetworkFile selectedFile;
+        NetworkFile selectedFile = null;
         List<NetworkFile> currentNetworkFiles;
 
         while (true) {
             try {
                 if (!sc.hasNextLine()) {
                     System.err.println("Nenhuma entrada detectada. Retornando ao menu.");
-                    CommandProcessor.showMenu();
-                    return;
+                    break;
                 }
                 String lineInput = sc.nextLine();
                 int selectedIndex = Integer.parseInt(lineInput.trim());
 
                 if (selectedIndex == 0) {
                     sharedFiles.clearNetworkFiles();
-                    CommandProcessor.showMenu();
-                    return;
+                    break;
                 }
 
                 currentNetworkFiles = sharedFiles.getNetworkFiles();
@@ -80,13 +87,10 @@ public class SearchFiles implements Command{
             }
         }
 
-        if (selectedFile == null) {
-            CommandProcessor.showMenu();
-            return;
-        }
+        return selectedFile;
+    }
 
-        System.out.println("Arquivo escolhido " + selectedFile.getFileName());
-
+    private void downloadFile(NetworkFile selectedFile) {
         long fileSize = selectedFile.getFileSize();
         long chunkSizeLong = chunk.getChunkSize();
         long totalChunks;
