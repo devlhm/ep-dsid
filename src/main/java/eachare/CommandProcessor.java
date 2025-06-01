@@ -1,6 +1,7 @@
 package eachare;
 
 import eachare.commands.*;
+import eachare.repository.NeighborList;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;

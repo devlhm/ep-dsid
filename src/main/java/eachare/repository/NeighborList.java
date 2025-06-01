@@ -1,38 +1,28 @@
-package eachare;
+package eachare.repository;
 
-import java.util.ArrayList;
+import eachare.Message;
+import eachare.Peer;
+import eachare.PeerStatus;
+
 import java.util.List;
 
-public class NeighborList {
+public class NeighborList extends BaseRepository<Peer> {
 
-    private final List<Peer> neighbors = new ArrayList<>();
-
+    @Override
     public void add(Peer neighbor) {
-        neighbors.add(neighbor);
+        super.add(neighbor);
         System.out.println("Adicionando novo peer " + neighbor.getIpAddress() + ":" + neighbor.getPort() + " status " + neighbor.getStatus());
     }
 
-    public List<Peer> getAll() {
-        return neighbors;
-    }
-
-    public Peer get(int idx) {
-        return neighbors.get(idx);
-    }
-
-    public int size() {
-        return neighbors.size();
-    }
-
     public void updateStatusByAddress(String address, int port, PeerStatus status) {
-        for(Peer neighbor : neighbors) {
+        for(Peer neighbor : entities) {
             if(neighbor.getIpAddress().equals(address) && neighbor.getPort() == port)
                 neighbor.setStatus(status);
         }
     }
 
     public void updateByAddress(Peer peer) {
-        for(Peer neighbor : neighbors) {
+        for(Peer neighbor : entities) {
             if(neighbor.getIpAddress().equals(peer.getIpAddress()) && neighbor.getPort() == peer.getPort()) {
                 neighbor.setStatus(peer.getStatus());
                 neighbor.setClockValue(peer.getClockValue());
@@ -41,7 +31,7 @@ public class NeighborList {
     }
 
     public boolean containsAddress(String address, int port) {
-        for(Peer neighbor : neighbors) {
+        for(Peer neighbor : entities) {
             if(neighbor.getIpAddress().equals(address) && neighbor.getPort() == port)
                 return true;
         }
@@ -50,7 +40,7 @@ public class NeighborList {
     }
 
     public Peer getByAddress(String address, int port) {
-        for(Peer neighbor : neighbors) {
+        for(Peer neighbor : entities) {
             if(neighbor.getIpAddress().equals(address) && neighbor.getPort() == port)
                 return neighbor;
         }
@@ -66,7 +56,7 @@ public class NeighborList {
 
     public int getOnlineNumber (){
         int onlineNumber = 0;
-        for (Peer peer : neighbors){
+        for (Peer peer : entities){
             if (peer.getStatus() == PeerStatus.ONLINE ) onlineNumber++;
         }
         return onlineNumber;

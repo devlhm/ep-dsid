@@ -1,6 +1,7 @@
 package eachare.commands;
 
 import eachare.*;
+import eachare.repository.NeighborList;
 
 public class GetPeers implements Command {
 

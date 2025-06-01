@@ -1,7 +1,7 @@
 package eachare.messagehandlers;
 
 import eachare.Message;
-import eachare.NeighborList;
+import eachare.repository.NeighborList;
 import eachare.Peer;
 import eachare.PeerStatus;
 

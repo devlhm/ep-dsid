@@ -1,8 +1,8 @@
 package eachare.messagehandlers;
 
 import eachare.*;
+import eachare.repository.NeighborList;
 
-import java.io.File;
 import java.util.List;
 
 public class ListSharedFilesHandler implements MessageHandler{

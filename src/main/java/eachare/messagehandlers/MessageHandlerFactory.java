@@ -1,6 +1,7 @@
 package eachare.messagehandlers;
 
 import eachare.*;
+import eachare.repository.NeighborList;
 
 public class MessageHandlerFactory {
 

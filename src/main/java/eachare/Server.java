@@ -1,6 +1,7 @@
 package eachare;
 
 import eachare.messagehandlers.*;
+import eachare.repository.NeighborList;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -5,11 +5,11 @@ import java.util.Scanner;
 public class Chunk {
     private int chunkSize = 256;
 
-    public int getChunkSize() {
+    public synchronized int getChunkSize() {
         return chunkSize;
     }
 
-    public void setChunkSize(int chunkSize) {
+    public synchronized void setChunkSize(int chunkSize) {
         this.chunkSize = chunkSize;
     }
 }

@@ -1,6 +1,7 @@
 package eachare.commands;
 
 import eachare.*;
+import eachare.repository.NeighborList;
 
 import java.util.ArrayList;
 import java.util.List;
