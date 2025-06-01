@@ -56,13 +56,12 @@ public class Server implements Runnable {
                 new Thread(() -> handleClient(clientSocket)).start();
 
             } catch (SocketException e) {
-                if (!running || (serverSocket != null && serverSocket.isClosed())) {
-                    // ServerSocket foi fechado, o que é esperado durante o shutdown
-                } else {
-                    // Outra SocketException inesperada
-                    System.err.println("SocketException ao aceitar conexão no servidor: " + e.getMessage());
-                }
-            } catch (IOException e) {
+
+				if (running && (serverSocket == null || !serverSocket.isClosed())) {
+					// Outra SocketException inesperada
+					System.err.println("SocketException ao aceitar conexão no servidor: " + e.getMessage());
+				}
+			} catch (IOException e) {
                 if (running) { // Logar apenas se o servidor deveria estar rodando
                     System.err.println("Erro de I/O ao aceitar conexão no servidor: " + e.getMessage());
                 }

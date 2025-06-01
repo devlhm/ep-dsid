@@ -32,15 +32,14 @@ public class MessageSender {
 
         // Se o ‘socket’ não existe, está fechado, não conectado, ou o writer não existe
         if (socket == null || socket.isClosed() || !socket.isConnected() || writer == null || writer.checkError()) {
-            if (socket != null || writer != null) {
-                closeConnectionInternal(peerKey, false); // false para não logar como fechamento explícito
-            }
+            closeConnection(peerKey); // false para não logar como fechamento explícito
             socket = new Socket(destinationAddress, destinationPort);
             socket.setKeepAlive(true);
             activeSockets.put(peerKey, socket);
             writer = new PrintWriter(socket.getOutputStream(), true);
             outputStreams.put(peerKey, writer);
         }
+
         return writer;
     }
 
@@ -51,6 +50,7 @@ public class MessageSender {
         message.setOriginPort(originPort);
 
         String peerKey = getKey(destinationAddress, destinationPort);
+
         try {
             PrintWriter out = getPrintWriter(destinationAddress, destinationPort);
 
@@ -58,28 +58,28 @@ public class MessageSender {
             out.println(message.toString().trim());
 
             if (out.checkError()) {
-                closeConnectionInternal(peerKey, true);
+                closeConnection(peerKey);
                 return false;
             }
 
             if (message.getType() == MessageType.BYE) {
-                closeConnectionInternal(peerKey, true);
+                closeConnection(peerKey);
             }
             // Para outras mensagens (DL, FILE), a conexão permanece aberta para reutilização.
             return true;
         } catch (Exception e) {
             System.err.println("Erro enviando mensagem para " + destinationAddress + ":" + destinationPort);
-            closeConnectionInternal(peerKey, true);
+            closeConnection(peerKey);
             return false;
         }
     }
 
     public void closeConnection(String destinationAddress, int destinationPort) {
         String peerKey = getKey(destinationAddress, destinationPort);
-        closeConnectionInternal(peerKey, true);
+        closeConnection(peerKey);
     }
 
-    private void closeConnectionInternal(String peerKey, boolean logExplicitClose) {
+    private void closeConnection(String peerKey) {
         Socket socket = activeSockets.remove(peerKey);
         PrintWriter writer = outputStreams.remove(peerKey);
 
@@ -96,8 +96,8 @@ public class MessageSender {
     }
 
     public void closeAllConnections() {
-        for (String peerKey : activeSockets.keySet().toArray(new String[0])) {
-            closeConnectionInternal(peerKey, true);
+        for (String peerKey : activeSockets.keySet()) {
+            closeConnection(peerKey);
         }
         activeSockets.clear();
         outputStreams.clear();
