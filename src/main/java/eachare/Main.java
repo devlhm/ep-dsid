@@ -1,5 +1,6 @@
 package eachare;
 
+import eachare.repository.DownloadStatRepository;
 import eachare.repository.NeighborList;
 
 import java.io.BufferedReader;
@@ -31,9 +32,10 @@ public class Main {
 
         Clock clock = new Clock();
         Chunk chunk = new Chunk();
+        DownloadStatRepository downloadStatRepository = new DownloadStatRepository();
 
         MessageSender messageSender = new MessageSender(clock, socketAddress, socketPort);
-        DownloadManager downloadManager = new DownloadManager(sharedFiles);
+        DownloadManager downloadManager = new DownloadManager(sharedFiles, downloadStatRepository, chunk);
 
         Server server = new Server(socketPort, socketAddress, neighbors, clock, sharedFiles, downloadManager, messageSender);
         DirectoryWatcher dirWatcher = new DirectoryWatcher(sharedFiles);

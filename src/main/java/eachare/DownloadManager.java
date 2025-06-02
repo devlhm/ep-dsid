@@ -1,12 +1,14 @@
 package eachare;
 
+import eachare.repository.DownloadStatRepository;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,12 +41,17 @@ public class DownloadManager {
     private final SharedFiles sharedFiles;
     private FileAssemblyData fileAssemblyData = null;
     private volatile CountDownLatch currentDownloadLatch;
-    private volatile String currentlyDownloadingFileName;
+    private volatile String currentDownloadFileName;
+    private volatile Instant currentDownloadStart;
+    private final DownloadStatRepository downloadStatRepository;
+    private volatile Set<String> currentDownloadSources;
+    private final Chunk chunk;
 
-
-    public DownloadManager(SharedFiles sharedFiles) {
+    public DownloadManager(SharedFiles sharedFiles, DownloadStatRepository downloadStatRepository, Chunk chunk) {
         this.sharedFiles = sharedFiles;
-    }
+		this.downloadStatRepository = downloadStatRepository;
+		this.chunk = chunk;
+	}
 
     public void prepareDownload(String fileName, long fileSize, int totalChunks) {
         if (totalChunks <= 0) {
@@ -52,8 +59,10 @@ public class DownloadManager {
                     ". Arquivos vazios devem ser tratados antes de chamar o DownloadManager ou ter totalChunks=1 para um chunk vazio.");
             return;
         }
-        this.currentlyDownloadingFileName = fileName;
+        this.currentDownloadFileName = fileName;
         this.currentDownloadLatch = new CountDownLatch(1);
+        this.currentDownloadStart = Instant.now();
+        this.currentDownloadSources = new HashSet<>();
         fileAssemblyData = new FileAssemblyData(fileName, fileSize, totalChunks);
 //        System.out.println("Preparando para baixar " + fileName + " (" + totalChunks + " chunks, " + fileSize + " bytes)");
     }
@@ -65,6 +74,8 @@ public class DownloadManager {
             System.err.println("Erro: Mensagem FILE com argumentos insuficientes. " + args);
             return;
         }
+
+        currentDownloadSources.add(message.getOriginAddress() + ":" + message.getOriginPort());
 
         String fileName = args.getFirst();
         int chunkIndex, chunkSize;
@@ -108,16 +119,27 @@ public class DownloadManager {
 
             // Verificar conclusão
             if (count == fileAssemblyData.totalChunks) {
+
+                DownloadStat stat = new DownloadStat(
+                        chunk.getChunkSize(),
+                        currentDownloadSources.size(),
+                        fileAssemblyData.fileSize,
+                        Duration.between(currentDownloadStart, Instant.now()).toMillis()
+                );
+
+                downloadStatRepository.add(stat);
+
 //                System.out.println("Todos os chunks recebidos para " + fileName + ". Montando arquivo...");
                 assembleFile(fileAssemblyData);
 //                System.out.println("\nDownload do arquivo " + fileName + " finalizado.");
 
-                if (this.currentDownloadLatch != null && fileAssemblyData.fileName.equals(this.currentlyDownloadingFileName)) {
+                if (this.currentDownloadLatch != null && fileAssemblyData.fileName.equals(this.currentDownloadFileName)) {
                     this.currentDownloadLatch.countDown();
                 }
 
                 this.fileAssemblyData = null;
-                this.currentlyDownloadingFileName = null;
+                this.currentDownloadFileName = null;
+                this.currentDownloadStart = null;
             }
         }
     }
