@@ -23,15 +23,19 @@ public class ShowStats implements Command {
 	public void execute() {
 		List<DownloadStat> stats = statRepository.getAll();
 
+		if (stats.isEmpty()) {
+			System.out.println("Nenhuma estatística disponível.");
+			return;
+		}
+
 		HashMap<StatKey, List<Long>> groupedDurations = new HashMap<>();
 
 		for(DownloadStat stat : stats) {
 			StatKey key = new StatKey(stat.chunkSize(), stat.peerAmount(), stat.fileSize());
 
-			groupedDurations.putIfAbsent(key,
-					new ArrayList<>());
-
-			groupedDurations.get(key).add(stat.duration());
+			groupedDurations
+				.computeIfAbsent(key, k -> new ArrayList<>())
+				.add(stat.durationInMillis());
 		}
 
 		System.out.printf("%-10s | %-7s | %-12s | %-3s | %-9s | %-9s |%n",
@@ -44,16 +48,17 @@ public class ShowStats implements Command {
 			List<Long> durations = entry.getValue();
 
 			long sum = durations.stream().mapToLong(Long::longValue).sum();
-			double avg = (double) sum / durations.size();
+			double mean = ((double) sum / durations.size());
 
 			double sq = 0.0;
 			for(long duration : durations)
-				sq += Math.pow(duration - avg, 2);
+				sq += Math.pow(duration - mean, 2);
 
 			double stdDev = Math.sqrt(sq / durations.size());
 
 			System.out.printf("%-10s | %-7s | %-12s | %-3s | %-9s | %-9s |%n",
-					key.chunkSize, key.peerAmount, key.fileSize, durations.size(), avg, stdDev);
+					key.chunkSize, key.peerAmount , key.fileSize, durations.size(),
+					String.format("%.5f", mean / 1000.0), String.format("%.5f", stdDev / 1000.0));
 		}
 	}
 }
