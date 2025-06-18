@@ -26,6 +26,7 @@ public class MessageHandlerFactory {
             case LS_LIST -> new ListSharedFilesHandler(sharedFiles, neighbors);
             case DL -> new DownloadHandler(sharedFiles, messageSender);
             case FILE -> new RecivedFileHandler(sharedFiles, downloadManager);
+            case BYE -> new ByeHandler(messageSender);
 			default -> null;
 		};
     }

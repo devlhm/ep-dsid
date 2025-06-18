@@ -19,5 +19,6 @@ public class Bye implements Command{
         for (Peer peer : neighbors.getAll())
             if (peer.getStatus() == PeerStatus.ONLINE)
                 messageSender.trySend(new Message(MessageType.BYE), peer.getIpAddress(), peer.getPort());
+        messageSender.closeAllConnections();
     }
 }

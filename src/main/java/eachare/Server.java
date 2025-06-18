@@ -71,7 +71,8 @@ public class Server implements Runnable {
     }
 
     private void handleClient(Socket clientSocket) {
-        // Usar try-with-resources para garantir que o socket e o reader sejam fechados
+        String peerAddress = null;
+        int peerPort = -1;
         try (Socket s = clientSocket;
              BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()))) {
 
@@ -83,6 +84,8 @@ public class Server implements Runnable {
                 }
                 try {
                     Message message = new Message(line);
+                    peerAddress = message.getOriginAddress();
+                    peerPort = message.getOriginPort();
                     onMessageReceived(message);
                     // Se a mensagem for BYE, o MessageHandler correspondente ou o MessageSender do outro lado
                     // podem fechar a conexão. O loop aqui terminará se in.readLine() retornar null.
@@ -92,7 +95,12 @@ public class Server implements Runnable {
             }
         } catch (SocketException e) {
             // Comum se o cliente fechar a conexão abruptamente
-            System.err.println("Conexão com " + clientSocket.getRemoteSocketAddress() + " encerrada (SocketException): " + e.getMessage());
+            if (peerAddress != null && peerPort != -1) {
+                messageSender.closeConnection(peerAddress, peerPort);
+                System.err.println("Conexão com " + peerAddress + ":" + peerPort + " encerrada (SocketException): " + e.getMessage());
+            } else {
+                System.err.println("Conexão com " + clientSocket.getRemoteSocketAddress() + " encerrada (SocketException): " + e.getMessage());
+            }
         } catch (IOException e) {
             System.err.println("Erro de I/O ao comunicar com " + clientSocket.getRemoteSocketAddress() + e.getMessage());
         }
