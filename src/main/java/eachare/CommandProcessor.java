@@ -1,6 +1,7 @@
 package eachare;
 
 import eachare.commands.*;
+import eachare.repository.DownloadStatRepository;
 import eachare.repository.NeighborList;
 
 import java.util.InputMismatchException;
@@ -10,8 +11,8 @@ public class CommandProcessor {
 
     private final CommandFactory commandFactory;
 
-    public CommandProcessor(NeighborList neighbors, SharedFiles sharedFiles, MessageSender messageSender, Chunk chunk, DownloadManager downloadManager) {
-        this.commandFactory = new CommandFactory(neighbors, sharedFiles, messageSender, chunk, downloadManager);
+    public CommandProcessor(NeighborList neighbors, SharedFiles sharedFiles, MessageSender messageSender, Chunk chunk, DownloadManager downloadManager, DownloadStatRepository downloadStatRepository) {
+        this.commandFactory = new CommandFactory(neighbors, sharedFiles, messageSender, chunk, downloadManager, downloadStatRepository);
     }
 
     public void run() {

@@ -54,7 +54,7 @@ public class Main {
         watcherThread.start();
         serverThread.start();
 
-        CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedFiles, server.getMessageSender(), chunk, downloadManager);
+        CommandProcessor commandProcessor = new CommandProcessor(neighbors, sharedFiles, server.getMessageSender(), chunk, downloadManager, downloadStatRepository);
         commandProcessor.run();
 
         dirWatcher.stop();
