@@ -2,13 +2,11 @@ package eachare.messagehandlers;
 
 import eachare.*;
 
-public class RecivedFileHandler implements MessageHandler {
+public class ReceivedFileHandler implements MessageHandler {
 
-    private final SharedFiles sharedFiles;
     private final DownloadManager downloadManager;
 
-    public RecivedFileHandler(SharedFiles sharedFiles, DownloadManager downloadManager) {
-        this.sharedFiles = sharedFiles;
+    public ReceivedFileHandler(DownloadManager downloadManager) {
         this.downloadManager = downloadManager;
     }
 

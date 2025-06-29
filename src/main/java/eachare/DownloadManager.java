@@ -78,11 +78,10 @@ public class DownloadManager {
         currentDownloadSources.add(message.getOriginAddress() + ":" + message.getOriginPort());
 
         String fileName = args.getFirst();
-        int chunkIndex, chunkSize;
+        int chunkIndex;
         String base64ChunkData = args.get(3);
 
         try {
-            chunkSize = Integer.parseInt(args.get(1));
             chunkIndex = Integer.parseInt(args.get(2));
         } catch (NumberFormatException e) {
             System.err.println("Erro ao parsear chunkIndex da mensagem FILE para " + fileName + ": " + e.getMessage());
