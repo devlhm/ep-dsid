@@ -75,8 +75,6 @@ public class DownloadManager {
             return;
         }
 
-        currentDownloadSources.add(message.getOriginAddress() + ":" + message.getOriginPort());
-
         String fileName = args.getFirst();
         int chunkIndex;
         String base64ChunkData = args.get(3);
@@ -108,6 +106,8 @@ public class DownloadManager {
 //                System.out.println("Chunk " + chunkIndex + " para o arquivo " + fileName + " já recebido. Ignorando duplicata.");
                 return;
             }
+
+            currentDownloadSources.add(message.getOriginAddress() + ":" + message.getOriginPort());
 
             fileAssemblyData.receivedBase64Chunks.set(chunkIndex, base64ChunkData);
             int count = fileAssemblyData.receivedChunkCount.incrementAndGet();
